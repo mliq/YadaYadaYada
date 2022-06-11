@@ -22,22 +22,24 @@ class Season:
             out_string += episode.__str__()
         return out_string
 
-    def add_episode(self, episode: Episode):
+    def add_episode(self, episode: Episode, save_to_disk: bool = False):
         self.episode_list[episode.episode_number] = episode
         self.ep_count += 1
-        episode.save_episode_metadata()
+        if save_to_disk is True:
+            episode.save_episode_metadata()
 
-    @measure_performance
+   # @measure_performance
     def load_scripts(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.ep_count) as executor:
             thread_pool = {}
             for episode in self.episode_list.values():
                 if episode.script_loaded is not True:
-                    print('new future - episode')
+                    # print('new future - episode')
                     thread_pool[episode.episode_number] = executor.submit(episode.load_script)
 
             for future in concurrent.futures.as_completed(thread_pool.values()):
-                print("\n Thread finished - episode == ", future.result())
+                pass
+                # print("\n Thread finished - episode == ", future.result())
         return f'{self.season}'
 
     def find_episode_by_epno(self, ep_no: int):
